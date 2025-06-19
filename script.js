@@ -25,6 +25,18 @@ const schema = {
 			street: {
 				type: 'textarea',
 			},
+			nestedSchema: {
+				type: 'schema',
+				schema: {
+					NestedText: {
+						type: 'text',
+						pattern: '[1-9]{1}[0-9]{3}',
+					},
+					NestedTextArea: {
+						type: 'textarea',
+					},
+				},
+			},
 		},
 	},
 }
@@ -100,6 +112,7 @@ export function renderSelect(
 }
 
 export function renderSchema(key, { label, hint, schema }) {
+	// debugger
 	const fieldSetElement = document.createElement('fieldset')
 
 	const legend = document.createElement('legend')
@@ -108,28 +121,29 @@ export function renderSchema(key, { label, hint, schema }) {
 	fieldSetElement.appendChild(legend)
 
 	Object.entries(schema).forEach(([inputKey, { type, ...attObj }]) => {
+		// debugger
 		const wrapperDiv = document.createElement('div')
 
-		const label = document.createElement('label')
-		label.setAttribute('for', `${key}[${inputKey}]`)
-		label.textContent = getLabel(inputKey)
-
-		let input
-
-		if (type === 'textarea') {
-			input = document.createElement('textarea')
-		} else {
-			input = document.createElement('input')
-		}
+		let input = undefined
+		let nestedSchema = undefined
 
 		switch (type) {
 			case 'textarea':
+				input = document.createElement('textarea')
 				break
 			case 'text':
+				input = document.createElement('input')
+				break
+			case 'schema':
+				nestedSchema = renderSchema(inputKey, attObj)
 				break
 			default:
 				break
 		}
+
+		const label = document.createElement('label')
+		label.setAttribute('for', `${key}[${inputKey}]`)
+		label.textContent = getLabel(inputKey)
 
 		input.name = `${key}[${inputKey}]`
 		input.id = `${key}[${inputKey}]`
@@ -149,7 +163,7 @@ export function renderSchema(key, { label, hint, schema }) {
 		fieldSetElement.appendChild(hintDiv)
 	}
 
-	body.appendChild(fieldSetElement)
+	return nestedSchema ? nestedSchema : fieldSetElement
 }
 
 const getLabel = (str) => `${str.charAt(0)?.toUpperCase()}${str.slice(1)}`
@@ -163,7 +177,8 @@ function renderEntry([key, options]) {
 			renderSelect(key, options)
 			break
 		case 'schema':
-			renderSchema(key, options)
+			const schema = renderSchema(key, options)
+			body.appendChild(schema)
 			break
 		default:
 			break
