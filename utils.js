@@ -1,4 +1,4 @@
-const body = document.body
+const body = document.getElementById('App')
 
 export function renderDate(key, { label, hint, ...attributes }) {
 	const wrapperDiv = document.createElement('div')
