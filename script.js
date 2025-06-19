@@ -31,26 +31,18 @@ const schema = {
 
 const entries = Object.entries(schema)
 
-function renderEntry([entryLabel, entryObj]) {
-	switch ('type' in entryObj ? entryObj.type : '') {
+function renderEntry([key, options]) {
+	switch (options.type) {
 		case 'date':
-			console.log('switch case date')
-			console.log('')
-			utils.renderDate(entryLabel, entryObj)
+			utils.renderDate(key, options)
 			break
 		case 'select':
-			console.log('switch case select')
-			console.log('')
-			utils.renderSelect(entryLabel, entryObj)
+			utils.renderSelect(key, options)
 			break
 		case 'schema':
-			console.log('switch case schema')
-			console.log('')
-			utils.renderSchema(entryLabel, entryObj)
+			utils.renderSchema(key, options)
 			break
 		default:
-			console.log('switch case default')
-			console.log('')
 			utils.renderDefault()
 			break
 	}
