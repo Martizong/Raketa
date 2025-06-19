@@ -120,12 +120,13 @@ export function renderSchema(key, { label, hint, schema }) {
 
 	fieldSetElement.appendChild(legend)
 
+	let nestedSchema = undefined
+
 	Object.entries(schema).forEach(([inputKey, { type, ...attObj }]) => {
 		// debugger
 		const wrapperDiv = document.createElement('div')
 
 		let input = undefined
-		let nestedSchema = undefined
 
 		switch (type) {
 			case 'textarea':
