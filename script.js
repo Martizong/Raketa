@@ -112,48 +112,48 @@ export function renderSelect(
 }
 
 export function renderSchema(key, { label, hint, schema }) {
-	// debugger
 	const fieldSetElement = document.createElement('fieldset')
 
 	const legend = document.createElement('legend')
 	legend.textContent = label ? label : getLabel(key)
-
 	fieldSetElement.appendChild(legend)
 
-	let nestedSchema = undefined
-
 	Object.entries(schema).forEach(([inputKey, { type, ...attObj }]) => {
-		// debugger
 		const wrapperDiv = document.createElement('div')
 
-		let input = undefined
+		if (type === 'schema') {
+			const nestedFieldset = renderSchema(inputKey, attObj)
+			wrapperDiv.appendChild(nestedFieldset)
+		} else {
+			let input
+			switch (type) {
+				case 'textarea':
+					input = document.createElement('textarea')
+					break
+				case 'text':
+					input = document.createElement('input')
+					input.type = 'text'
+					break
+				default:
+					input = document.createElement('input')
+					input.type = type
+			}
 
-		switch (type) {
-			case 'textarea':
-				input = document.createElement('textarea')
-				break
-			case 'text':
-				input = document.createElement('input')
-				break
-			case 'schema':
-				nestedSchema = renderSchema(inputKey, attObj)
-				break
-			default:
-				break
+			const label = document.createElement('label')
+			label.setAttribute('for', `${key}[${inputKey}]`)
+			label.textContent = getLabel(inputKey)
+
+			input.name = `${key}[${inputKey}]`
+			input.id = `${key}[${inputKey}]`
+			Object.entries(attObj).forEach(([attribute, value]) => {
+				if (attribute !== 'schema') {
+					input.setAttribute(attribute, value)
+				}
+			})
+
+			wrapperDiv.appendChild(label)
+			wrapperDiv.appendChild(input)
 		}
-
-		const label = document.createElement('label')
-		label.setAttribute('for', `${key}[${inputKey}]`)
-		label.textContent = getLabel(inputKey)
-
-		input.name = `${key}[${inputKey}]`
-		input.id = `${key}[${inputKey}]`
-		Object.entries(attObj).forEach(([attribute, value]) =>
-			input.setAttribute(attribute, value)
-		)
-
-		wrapperDiv.appendChild(label)
-		wrapperDiv.appendChild(input)
 
 		fieldSetElement.appendChild(wrapperDiv)
 	})
@@ -164,7 +164,7 @@ export function renderSchema(key, { label, hint, schema }) {
 		fieldSetElement.appendChild(hintDiv)
 	}
 
-	return nestedSchema ? nestedSchema : fieldSetElement
+	return fieldSetElement
 }
 
 const getLabel = (str) => `${str.charAt(0)?.toUpperCase()}${str.slice(1)}`
